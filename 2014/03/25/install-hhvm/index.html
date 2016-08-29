@@ -1,0 +1,836 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="HHVM," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Zinway's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前几天（03月21日），Facebook 正式发布专门用于 HHVM 的编程语言 Hack，然后就突然想装个HHVM来跑我的blog玩一下，后面也确实开始折腾了。
+03月22日晚上就试水了下，按GitHub上或者是HHVM官网上的教程来的，提示依赖的几个编译环境的版本太低了。然后就去折腾找更新的rpm啊（各种第三方repo，各种Google），发现了一个悲剧的现状：目前CentOS6下还木有现成的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在CentOS6.5上安装HHVM3.0(解决依赖问题)">
+<meta property="og:url" content="http://o.or2.io/2014/03/25/install-hhvm/index.html">
+<meta property="og:site_name" content="Zinway's Blog">
+<meta property="og:description" content="前几天（03月21日），Facebook 正式发布专门用于 HHVM 的编程语言 Hack，然后就突然想装个HHVM来跑我的blog玩一下，后面也确实开始折腾了。
+03月22日晚上就试水了下，按GitHub上或者是HHVM官网上的教程来的，提示依赖的几个编译环境的版本太低了。然后就去折腾找更新的rpm啊（各种第三方repo，各种Google），发现了一个悲剧的现状：目前CentOS6下还木有现成的">
+<meta property="og:updated_time" content="2016-08-29T05:38:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在CentOS6.5上安装HHVM3.0(解决依赖问题)">
+<meta name="twitter:description" content="前几天（03月21日），Facebook 正式发布专门用于 HHVM 的编程语言 Hack，然后就突然想装个HHVM来跑我的blog玩一下，后面也确实开始折腾了。
+03月22日晚上就试水了下，按GitHub上或者是HHVM官网上的教程来的，提示依赖的几个编译环境的版本太低了。然后就去折腾找更新的rpm啊（各种第三方repo，各种Google），发现了一个悲剧的现状：目前CentOS6下还木有现成的">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://o.or2.io/2014/03/25/install-hhvm/"/>
+
+  <title> 在CentOS6.5上安装HHVM3.0(解决依赖问题) | Zinway's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Zinway's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Talk about the Soy Sauce</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-fullstack">
+          <a href="/full-stack" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bomb"></i> <br />
+            
+            Full Stack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-book"></i> <br />
+            
+            书架
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                在CentOS6.5上安装HHVM3.0(解决依赖问题)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2014-03-25T23:20:30+08:00" content="2014-03-25">
+              2014-03-25
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/LNMP-Stack/" itemprop="url" rel="index">
+                    <span itemprop="name">LNMP Stack</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2014/03/25/install-hhvm/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2014/03/25/install-hhvm/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前几天（03月21日），Facebook 正式发布专门用于 HHVM 的编程语言 Hack，然后就突然想装个HHVM来跑我的blog玩一下，后面也确实开始折腾了。</p>
+<p>03月22日晚上就试水了下，按GitHub上或者是HHVM官网上的教程来的，提示依赖的几个编译环境的版本太低了。然后就去折腾找更新的rpm啊（各种第三方repo，各种Google），发现了一个悲剧的现状：目前CentOS6下还木有现成的高版本的编译环境的rpm，然后那天晚上时间也不早了就放弃了。</p>
+<p>03月25日晚上，就又突然想起这个事，然后就又搞起来了。</p>
+<p>办法嘛只有1个：那就是用老的（低版本的）编译环境去编译一个新的（高版本的）编译环境。好像有点绕，就拿gcc举个例子，目前是用gcc 4.4.7编译了个gcc 4.8.2，这就是悲催的现实。</p>
+<p>低版本的环境：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@ ~]# type gcc</div><div class="line">gcc is /usr/bin/gcc</div><div class="line">[root@ ~]# gcc -v</div><div class="line">使用内建 specs。</div><div class="line">目标：x86_64-redhat-linux</div><div class="line">配置为：../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux</div><div class="line">线程模型：posix</div><div class="line">gcc 版本 4.4.7 20120313 (Red Hat 4.4.7-4) (GCC) </div><div class="line">[root@ ~]#</div></pre></td></tr></table></figure></p>
+<p>编译完的高版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@ ~]# gcc -v</div><div class="line">使用内建 specs。</div><div class="line">COLLECT_GCC=gcc</div><div class="line">COLLECT_LTO_WRAPPER=/usr/local/libexec/gcc/x86_64-unknown-linux-gnu/4.8.2/lto-wrapper</div><div class="line">目标：x86_64-unknown-linux-gnu</div><div class="line">配置为：./configure --enable-checking=release --enable-languages=c,c++ --disable-multilib</div><div class="line">线程模型：posix</div><div class="line">gcc 版本 4.8.2 (GCC) </div><div class="line">[root@ ~]#</div></pre></td></tr></table></figure></p>
+<p>上面只是把GCC 4.8.2编译安装了，后面还要替换下系统的链接库：/usr/lib64/libstdc++.so.6</p>
+<p>旧版和新版GLIBC支持的对比：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">[root@ ~]# strings /usr/lib64/libstdc++.so.6.bak |grep GLIBC</div><div class="line">GLIBCXX_3.4</div><div class="line">GLIBCXX_3.4.1</div><div class="line">GLIBCXX_3.4.2</div><div class="line">GLIBCXX_3.4.3</div><div class="line">GLIBCXX_3.4.4</div><div class="line">GLIBCXX_3.4.5</div><div class="line">GLIBCXX_3.4.6</div><div class="line">GLIBCXX_3.4.7</div><div class="line">GLIBCXX_3.4.8</div><div class="line">GLIBCXX_3.4.9</div><div class="line">GLIBCXX_3.4.10</div><div class="line">GLIBCXX_3.4.11</div><div class="line">GLIBCXX_3.4.12</div><div class="line">GLIBCXX_3.4.13</div><div class="line">GLIBC_2.2.5</div><div class="line">GLIBC_2.3</div><div class="line">GLIBC_2.4</div><div class="line">GLIBC_2.3.2</div><div class="line">GLIBCXX_FORCE_NEW</div><div class="line">GLIBCXX_DEBUG_MESSAGE_LENGTH</div><div class="line">[root@ ~]# strings /usr/lib64/libstdc++.so.6 |grep GLIBC</div><div class="line">GLIBCXX_3.4</div><div class="line">GLIBCXX_3.4.1</div><div class="line">GLIBCXX_3.4.2</div><div class="line">GLIBCXX_3.4.3</div><div class="line">GLIBCXX_3.4.4</div><div class="line">GLIBCXX_3.4.5</div><div class="line">GLIBCXX_3.4.6</div><div class="line">GLIBCXX_3.4.7</div><div class="line">GLIBCXX_3.4.8</div><div class="line">GLIBCXX_3.4.9</div><div class="line">GLIBCXX_3.4.10</div><div class="line">GLIBCXX_3.4.11</div><div class="line">GLIBCXX_3.4.12</div><div class="line">GLIBCXX_3.4.13</div><div class="line">GLIBCXX_3.4.14</div><div class="line">GLIBCXX_3.4.15</div><div class="line">GLIBCXX_3.4.16</div><div class="line">GLIBCXX_3.4.17</div><div class="line">GLIBCXX_3.4.18</div><div class="line">GLIBCXX_3.4.19</div><div class="line">GLIBC_2.3</div><div class="line">GLIBC_2.2.5</div><div class="line">GLIBC_2.3.2</div><div class="line">GLIBCXX_FORCE_NEW</div><div class="line">GLIBCXX_DEBUG_MESSAGE_LENGTH</div><div class="line">[root@ ~]#</div></pre></td></tr></table></figure></p>
+<p>03月26日，下面类似编译cmake等依赖环境。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root@ ~]# cmake --version</div><div class="line">cmake version 2.6-patch 4</div><div class="line">[root@ ~]# </div><div class="line">==&gt;</div><div class="line">[root@ ~]# cmake --version</div><div class="line">cmake version 2.8.12.2</div><div class="line">[root@ ~]#</div></pre></td></tr></table></figure></p>
+<p>截止到03月26日21:44，终于把依赖的环境全编译好了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div></pre></td><td class="code"><pre><div class="line">[root@ hhvm]# cmake .</div><div class="line">Using HPHP_HOME == /root/hhvm_tmp/hhvm</div><div class="line">-- CMAKE_PREFIX_PATH was missing, proceeding anyway</div><div class="line">-- Boost version: 1.55.0</div><div class="line">-- Found the following Boost libraries:</div><div class="line">--   system</div><div class="line">--   program_options</div><div class="line">--   filesystem</div><div class="line">--   regex</div><div class="line">-- Found LibMagicWand: /usr/lib64/libMagickWand.so  </div><div class="line">-- MySQL Include dir: /usr/include/mysql  library dir: /usr/lib64/mysql</div><div class="line">-- MySQL client libraries: mysqlclient_r</div><div class="line">-- Found PCRE: /usr/lib64/libpcre.so  </div><div class="line">-- Found libevent: /usr/lib64/libevent.so</div><div class="line">-- Looking for evhttp_bind_socket_with_fd</div><div class="line">-- Looking for evhttp_bind_socket_with_fd - not found</div><div class="line">-- Could NOT find LibUODBC (missing:  LIBODBC_LIBRARIES LIBODBC_INCLUDE_DIRS) </div><div class="line">-- Found LibJpeg: /usr/lib64/libjpeg.so  </div><div class="line">-- Found LibPng: /usr/lib64/libpng.so  </div><div class="line">-- Found PkgConfig: /usr/bin/pkg-config (found version &quot;0.23&quot;) </div><div class="line">-- Found Freetype: /usr/lib64/libfreetype.so  </div><div class="line">-- Found CURL: /usr/lib64/libcurl.so (found version &quot;7.37.0-DEV&quot;) </div><div class="line">-- Looking for curl_multi_select</div><div class="line">-- Looking for curl_multi_select - not found</div><div class="line">-- Looking for curl_multi_wait</div><div class="line">-- Looking for curl_multi_wait - not found</div><div class="line">-- Found LibXml2: /usr/lib64/libxml2.so (found version &quot;2.7.6&quot;) </div><div class="line">-- Found LibXslt: /usr/lib64/libxslt.so (found version &quot;1.1.26&quot;) </div><div class="line">-- Found EXPAT: /usr/lib64/libexpat.so (found version &quot;2.0.1&quot;) </div><div class="line">-- Found ICU header files in /usr/include</div><div class="line">-- Found ICU libraries: /usr/lib64/libicuuc.so</div><div class="line">-- Performing Test JEMALLOC_VERSION_3</div><div class="line">-- Performing Test JEMALLOC_VERSION_3 - Success</div><div class="line">-- Found jemalloc: /usr/lib64/libjemalloc.so</div><div class="line">-- Found Intel TBB</div><div class="line">-- Found mcrypt: /usr/lib64/libmcrypt.so</div><div class="line">-- Found OpenSSL: /usr/lib64/libssl.so;/usr/lib64/libcrypto.so (found version &quot;1.0.1e&quot;) </div><div class="line">-- Found ZLIB: /usr/lib64/libz.so (found version &quot;1.2.3&quot;) </div><div class="line">-- Found BZip2: /usr/lib64/libbz2.so (found version &quot;1.0.5&quot;) </div><div class="line">-- Looking for BZ2_bzCompressInit in /usr/lib64/libbz2.so</div><div class="line">-- Looking for BZ2_bzCompressInit in /usr/lib64/libbz2.so - found</div><div class="line">-- Found ONIGURUMA: /usr/lib64/libonig.so  </div><div class="line">-- Found ldap: /usr/lib64/libldap.so;/usr/lib64/liblber.so</div><div class="line">-- Found LIBPTHREAD: /usr/lib64/libpthread.so  </div><div class="line">-- Found Readline: /usr/include  </div><div class="line">-- Could NOT find Editline (missing:  EDITLINE_LIBRARIES EDITLINE_INCLUDE_DIRS) </div><div class="line">-- Found LibElf: /usr/lib64/libelf.so  </div><div class="line">-- Performing Test ELF_GETSHDRSTRNDX</div><div class="line">-- Performing Test ELF_GETSHDRSTRNDX - Success</div><div class="line">-- Found LibDwarf: /usr/lib64/libdwarf.so  </div><div class="line">-- Looking for dwarf_encode_leb128</div><div class="line">-- Looking for dwarf_encode_leb128 - found</div><div class="line">Generating Release build</div><div class="line">-- Performing Test FOLLY_IFUNC</div><div class="line">-- Performing Test FOLLY_IFUNC - Failed</div><div class="line">-- Looking for clock_gettime</div><div class="line">-- Looking for clock_gettime - found</div><div class="line">-- Looking for arpa/inet.h</div><div class="line">-- Looking for arpa/inet.h - found</div><div class="line">-- Looking for netinet/in.h</div><div class="line">-- Looking for netinet/in.h - found</div><div class="line">-- Looking for stddef.h</div><div class="line">-- Looking for stddef.h - found</div><div class="line">-- Looking for stdint.h</div><div class="line">-- Looking for stdint.h - found</div><div class="line">-- Looking for string.h</div><div class="line">-- Looking for string.h - found</div><div class="line">-- Looking for sys/socket.h</div><div class="line">-- Looking for sys/socket.h - found</div><div class="line">-- Looking for sys/time.h</div><div class="line">-- Looking for sys/time.h - found</div><div class="line">-- Looking for unistd.h</div><div class="line">-- Looking for unistd.h - found</div><div class="line">-- Looking for sys/types.h</div><div class="line">-- Looking for sys/types.h - found</div><div class="line">-- Looking for stdint.h</div><div class="line">-- Looking for stdint.h - found</div><div class="line">-- Looking for stddef.h</div><div class="line">-- Looking for stddef.h - found</div><div class="line">-- Check size of size_t</div><div class="line">-- Check size of size_t - done</div><div class="line">-- Check size of ssize_t</div><div class="line">-- Check size of ssize_t - done</div><div class="line">-- Check size of uint32_t</div><div class="line">-- Check size of uint32_t - done</div><div class="line">-- Check size of uint8_t</div><div class="line">-- Check size of uint8_t - done</div><div class="line">-- Looking for AF_LOCAL</div><div class="line">-- Looking for AF_LOCAL - found</div><div class="line">-- Looking for PF_LOCAL</div><div class="line">-- Looking for PF_LOCAL - found</div><div class="line">-- Looking for memset</div><div class="line">-- Looking for memset - found</div><div class="line">-- Looking for socket</div><div class="line">-- Looking for socket - found</div><div class="line">-- Looking for strerror</div><div class="line">-- Looking for strerror - found</div><div class="line">-- Found libevent: /usr/lib64/libevent.so</div><div class="line">-- Looking for event_get_version_number</div><div class="line">-- Looking for event_get_version_number - not found</div><div class="line">-- Performing Test HAVE_LIBEVENT_145</div><div class="line">-- Performing Test HAVE_LIBEVENT_145 - Success</div><div class="line">-- Found libevent 1.4.5+</div><div class="line">-- Looking for include file stdlib.h</div><div class="line">-- Looking for include file stdlib.h - found</div><div class="line">-- Looking for include file assert.h</div><div class="line">-- Looking for include file assert.h - found</div><div class="line">-- Looking for strcasecmp</div><div class="line">-- Looking for strcasecmp - found</div><div class="line">-- Looking for strchr</div><div class="line">-- Looking for strchr - found</div><div class="line">-- Looking for include file sys/stat.h</div><div class="line">-- Looking for include file sys/stat.h - found</div><div class="line">-- Looking for include file stdlib.h</div><div class="line">-- Looking for include file stdlib.h - found</div><div class="line">-- Looking for include file string.h</div><div class="line">-- Looking for include file string.h - found</div><div class="line">-- Looking for include file memory.h</div><div class="line">-- Looking for include file memory.h - found</div><div class="line">-- Looking for include file strings.h</div><div class="line">-- Looking for include file strings.h - found</div><div class="line">-- Looking for include file inttypes.h</div><div class="line">-- Looking for include file inttypes.h - found</div><div class="line">-- Looking for include file unistd.h</div><div class="line">-- Looking for include file unistd.h - found</div><div class="line">-- Looking for include file dlfcn.h</div><div class="line">-- Looking for include file dlfcn.h - found</div><div class="line">-- Looking for fdatasync</div><div class="line">-- Looking for fdatasync - found</div><div class="line">-- Looking for usleep</div><div class="line">-- Looking for usleep - found</div><div class="line">-- Looking for fullfsync</div><div class="line">-- Looking for fullfsync - not found</div><div class="line">-- Looking for localtime_r</div><div class="line">-- Looking for localtime_r - found</div><div class="line">-- Looking for gmtime_r</div><div class="line">-- Looking for gmtime_r - found</div><div class="line">-- Looking for pthread_create in pthread</div><div class="line">-- Looking for pthread_create in pthread - found</div><div class="line">-- Check if the system is big endian</div><div class="line">-- Searching 16 bit integer</div><div class="line">-- Check size of unsigned short</div><div class="line">-- Check size of unsigned short - done</div><div class="line">-- Using unsigned short</div><div class="line">-- Check if the system is big endian - little endian</div><div class="line">-- Looking for include file locale.h</div><div class="line">-- Looking for include file locale.h - found</div><div class="line">-- Looking for include file limits.h</div><div class="line">-- Looking for include file limits.h - found</div><div class="line">-- Check size of int32_t</div><div class="line">-- Check size of int32_t - done</div><div class="line">-- Looking for strtoll</div><div class="line">-- Looking for strtoll - found</div><div class="line">-- Looking for atoll</div><div class="line">-- Looking for atoll - found</div><div class="line">-- Looking for strftime</div><div class="line">-- Looking for strftime - found</div><div class="line">-- Looking for setlocale</div><div class="line">-- Looking for setlocale - found</div><div class="line">-- Boost version: 1.55.0</div><div class="line">-- Found the following Boost libraries:</div><div class="line">--   system</div><div class="line">--   program_options</div><div class="line">--   filesystem</div><div class="line">--   regex</div><div class="line">-- Looking for _close</div><div class="line">-- Looking for _close - not found</div><div class="line">-- Looking for _dup</div><div class="line">-- Looking for _dup - not found</div><div class="line">-- Looking for _fdopen</div><div class="line">-- Looking for _fdopen - not found</div><div class="line">-- Looking for _fileno</div><div class="line">-- Looking for _fileno - not found</div><div class="line">-- Looking for _open</div><div class="line">-- Looking for _open - not found</div><div class="line">-- Looking for _snprintf</div><div class="line">-- Looking for _snprintf - not found</div><div class="line">-- Looking for _strdup</div><div class="line">-- Looking for _strdup - not found</div><div class="line">-- Looking for _stricmp</div><div class="line">-- Looking for _stricmp - not found</div><div class="line">-- Looking for fseeko</div><div class="line">-- Looking for fseeko - found</div><div class="line">-- Looking for ftello</div><div class="line">-- Looking for ftello - found</div><div class="line">-- Looking for open</div><div class="line">-- Looking for open - found</div><div class="line">-- Looking for mkstemp</div><div class="line">-- Looking for mkstemp - found</div><div class="line">-- Looking for snprintf</div><div class="line">-- Looking for snprintf - found</div><div class="line">-- Looking for strdup</div><div class="line">-- Looking for strdup - found</div><div class="line">-- Looking for MoveFileExA</div><div class="line">-- Looking for MoveFileExA - not found</div><div class="line">-- Looking for include file sys/types.h</div><div class="line">-- Looking for include file sys/types.h - found</div><div class="line">-- Looking for include file inttypes.h</div><div class="line">-- Looking for include file inttypes.h - found</div><div class="line">-- Looking for include file stdint.h</div><div class="line">-- Looking for include file stdint.h - found</div><div class="line">-- Check size of __int8</div><div class="line">-- Check size of __int8 - failed</div><div class="line">-- Check size of int8_t</div><div class="line">-- Check size of int8_t - done</div><div class="line">-- Check size of uint8_t</div><div class="line">-- Check size of uint8_t - done</div><div class="line">-- Check size of __int16</div><div class="line">-- Check size of __int16 - failed</div><div class="line">-- Check size of int16_t</div><div class="line">-- Check size of int16_t - done</div><div class="line">-- Check size of uint16_t</div><div class="line">-- Check size of uint16_t - done</div><div class="line">-- Check size of __int32</div><div class="line">-- Check size of __int32 - failed</div><div class="line">-- Check size of int32_t</div><div class="line">-- Check size of int32_t - done</div><div class="line">-- Check size of uint32_t</div><div class="line">-- Check size of uint32_t - done</div><div class="line">-- Check size of __int64</div><div class="line">-- Check size of __int64 - failed</div><div class="line">-- Check size of int64_t</div><div class="line">-- Check size of int64_t - done</div><div class="line">-- Check size of uint64_t</div><div class="line">-- Check size of uint64_t - done</div><div class="line">-- Check size of short</div><div class="line">-- Check size of short - done</div><div class="line">-- Check size of int</div><div class="line">-- Check size of int - done</div><div class="line">-- Check size of long</div><div class="line">-- Check size of long - done</div><div class="line">-- Check size of long long</div><div class="line">-- Check size of long long - done</div><div class="line">-- Check size of off_t</div><div class="line">-- Check size of off_t - done</div><div class="line">-- Check size of size_t</div><div class="line">-- Check size of size_t - done</div><div class="line">-- Check size of ssize_t</div><div class="line">-- Check size of ssize_t - done</div><div class="line">-- Boost version: 1.55.0</div><div class="line">-- Found the following Boost libraries:</div><div class="line">--   thread</div><div class="line">--   system</div><div class="line">-- Boost version: 1.55.0</div><div class="line">-- Found the following Boost libraries:</div><div class="line">--   thread</div><div class="line">--   system</div><div class="line">-- OCaml not found, will not build Hack typechecker</div><div class="line">-- Configuring done</div><div class="line">-- Generating done</div><div class="line">-- Build files have been written to: /root/hhvm_tmp/hhvm</div><div class="line">[root@ hhvm]#</div></pre></td></tr></table></figure></p>
+<p>下一步就是跑HHVM的make。</p>
+<p>03月27日21:30</p>
+<p>我去，HHVM的编译卡在imagick了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">[ 51%] Building CXX object hphp/runtime/CMakeFiles/hphp_runtime_static.dir/ext/imagick/ext_imagick.cpp.o</div><div class="line">[ 51%] Building CXX object hphp/runtime/CMakeFiles/hphp_runtime_static.dir/ext/imagick/constants.cpp.o</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp: 在函数‘void HPHP::loadImagickConstants()’中:</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:760:52: 错误：‘ModulusAddCompositeOp’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPOSITE_MODULUSADD, ModulusAddCompositeOp);</div><div class="line">                                                    ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:762:28: 错误：‘ModulusSubtractCompositeOp’在此作用域中尚未声明</div><div class="line">                            ModulusSubtractCompositeOp);</div><div class="line">                            ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:809:43: 错误：‘JincFilter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_JINC, JincFilter);</div><div class="line">                                           ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:810:47: 错误：‘SincFastFilter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_SINCFAST, SincFastFilter);</div><div class="line">                                               ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:811:47: 错误：‘RobidouxFilter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_ROBIDOUX, RobidouxFilter);</div><div class="line">                                               ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:812:51: 错误：‘LanczosSharpFilter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_LANCZOSSHARP, LanczosSharpFilter);</div><div class="line">                                                   ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:813:47: 错误：‘Lanczos2Filter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_LANCZOS2, Lanczos2Filter);</div><div class="line">                                               ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:814:52: 错误：‘Lanczos2SharpFilter’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_FILTER_LANCZOS2SHARP, Lanczos2SharpFilter);</div><div class="line">                                                    ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:864:48: 错误：‘ZipSCompression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_ZIPS, ZipSCompression);</div><div class="line">                                                ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:865:47: 错误：‘PizCompression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_PIZ, PizCompression);</div><div class="line">                                               ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:866:49: 错误：‘Pxr24Compression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_PXR24, Pxr24Compression);</div><div class="line">                                                 ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:867:47: 错误：‘B44Compression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_B44, B44Compression);</div><div class="line">                                               ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:868:48: 错误：‘B44ACompression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_B44A, B44ACompression);</div><div class="line">                                                ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:869:48: 错误：‘LZMACompression’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_COMPRESSION_LZMA, LZMACompression);</div><div class="line">                                                ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:944:44: 错误：‘SyncChannels’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_CHANNEL_SYNC, SyncChannels);</div><div class="line">                                            ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:1006:45: 错误：‘MeanEvaluateOperator’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_EVALUATE_MEAN, MeanEvaluateOperator);</div><div class="line">                                             ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:1007:44: 错误：‘AbsEvaluateOperator’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_EVALUATE_ABS, AbsEvaluateOperator);</div><div class="line">                                            ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:1009:28: 错误：‘ExponentialEvaluateOperator’在此作用域中尚未声明</div><div class="line">                            ExponentialEvaluateOperator);</div><div class="line">                            ^</div><div class="line">/root/hhvm/hphp/runtime/ext/imagick/constants.cpp:1010:47: 错误：‘MedianEvaluateOperator’在此作用域中尚未声明</div><div class="line">   registerImagickConstants(s_EVALUATE_MEDIAN, MedianEvaluateOperator);</div><div class="line">                                               ^</div><div class="line">make[2]: *** [hphp/runtime/CMakeFiles/hphp_runtime_static.dir/ext/imagick/constants.cpp.o] 错误 1</div><div class="line">make[1]: *** [hphp/runtime/CMakeFiles/hphp_runtime_static.dir/all] 错误 2</div><div class="line">make: *** [all] 错误 2</div><div class="line">➜</div></pre></td></tr></table></figure></p>
+<p>靠，果然是被yum默认装的ImageMagick-devel给坑了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">IMAGEMAGICK_BINARY_PATH:PATH=/usr/bin</div><div class="line">IMAGEMAGICK_COMPOSITE_EXECUTABLE:FILEPATH=/usr/bin/composite</div><div class="line">IMAGEMAGICK_CONVERT_EXECUTABLE:FILEPATH=/usr/bin/convert</div><div class="line">IMAGEMAGICK_IMPORT_EXECUTABLE:FILEPATH=/usr/bin/import</div><div class="line">IMAGEMAGICK_MOGRIFY_EXECUTABLE:FILEPATH=/usr/bin/mogrify</div><div class="line">IMAGEMAGICK_MONTAGE_EXECUTABLE:FILEPATH=/usr/bin/montage</div><div class="line">ImageMagick_EXECUTABLE_DIR:PATH=/usr/bin</div><div class="line">ImageMagick_MagickCore_INCLUDE_DIR:PATH=/usr/include/ImageMagick</div><div class="line">ImageMagick_MagickCore_LIBRARY:FILEPATH=/usr/lib64/libMagickCore.so</div><div class="line">ImageMagick_MagickWand_INCLUDE_DIR:PATH=/usr/include/ImageMagick</div><div class="line">ImageMagick_MagickWand_LIBRARY:FILEPATH=/usr/lib64/libMagickWand.so</div></pre></td></tr></table></figure></p>
+<p>怒删之。</p>
+<p>03月29日凌晨01:08</p>
+<p>终于在CentOS 6.5上把HHVM3.0编译出来了，来回折腾了小7个晚上。</p>
+<p>（各种环境版本问题，还有”/usr/lib64”和”/usr/lib”的问题等等，坑死~）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">[ 93%] Building CXX object hphp/runtime/ext_hhvm/CMakeFiles/ext_hhvm_static.dir/ext_hhvm_infotabs.cpp.o</div><div class="line">Linking CXX static library libext_hhvm.a</div><div class="line">[ 93%] Built target ext_hhvm_static</div><div class="line">[ 97%] Built target hphp_util</div><div class="line">[ 98%] Built target vixl</div><div class="line">[ 98%] Built target hphp_zend</div><div class="line">[ 98%] Generating systemlib.php</div><div class="line">[ 98%] Built target systemlib</div><div class="line">Scanning dependencies of target hhvm</div><div class="line">[ 98%] Building CXX object hphp/hhvm/CMakeFiles/hhvm.dir/main.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/hhvm/CMakeFiles/hhvm.dir/process-init.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/hhvm/CMakeFiles/hhvm.dir/global-variables.cpp.o</div><div class="line">Linking CXX executable hhvm</div><div class="line">Embedding php in hhvm</div><div class="line">[ 99%] Built target hhvm</div><div class="line">Scanning dependencies of target test</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_ext_memcached.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/main.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_util.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_logger.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_base.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_parser.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_server.cpp.o</div><div class="line">[ 99%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_parser_stmt.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_code_error.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_all.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_ext_server.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_cpp_base.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_fastcgi.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_ext_apc.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_parser_expr.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_ext_mysql.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_fastcgi_protocol.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_code_run.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/ext/test_cpp_ext.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/__/hhvm/process-init.cpp.o</div><div class="line">[100%] Building CXX object hphp/test/CMakeFiles/test.dir/__/hhvm/global-variables.cpp.o</div><div class="line">Linking CXX executable test</div><div class="line">Embedding php in test</div><div class="line">[100%] Built target test</div><div class="line">➜  hhvm git:(HHVM-3.0) ✗</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">➜  hhvm git:(HHVM-3.0) ✗ make install</div><div class="line">[  2%] Built target folly</div><div class="line">[  2%] Built target double-conversion</div><div class="line">[  3%] Built target gen-class-map</div><div class="line">[  3%] Built target gen-ext-hhvm</div><div class="line">[  3%] Built target gen-infotabs</div><div class="line">[  3%] Built target afdt</div><div class="line">[  8%] Built target mbfl</div><div class="line">[  8%] Built target sqlite3</div><div class="line">[  9%] Built target timelib</div><div class="line">[  9%] Built target lz4</div><div class="line">[ 15%] Built target zip_shared</div><div class="line">[ 21%] Built target zip_static</div><div class="line">[ 23%] Built target hphp_thrift</div><div class="line">[ 23%] Built target hphp_proxygen</div><div class="line">[ 23%] Built target hphp_system</div><div class="line">[ 23%] Built target hphp_parser</div><div class="line">[ 30%] Built target hphp_analysis</div><div class="line">[ 32%] Built target hphp_hhbbc</div><div class="line">[ 33%] Built target neo</div><div class="line">[ 68%] Built target hphp_runtime_static</div><div class="line">[ 96%] Built target ext_hhvm_static</div><div class="line">[100%] Built target hphp_util</div><div class="line">[100%] Built target vixl</div><div class="line">[100%] Built target hphp_zend</div><div class="line">[100%] Generating systemlib.php</div><div class="line">[100%] Built target systemlib</div><div class="line">Linking CXX executable hhvm</div><div class="line">Embedding php in hhvm</div><div class="line">[100%] Built target hhvm</div><div class="line">Install the project...</div><div class="line">-- Install configuration: &quot;&quot;</div><div class="line">-- Installing: /usr/lib/libzip.a</div><div class="line">-- Installing: /usr/lib/libzip.so</div><div class="line">-- Removed runtime path from &quot;/usr/lib/libzip.so&quot;</div><div class="line">-- Installing: /usr/include/zipconf.h</div><div class="line">-- Installing: /usr/include/zip.h</div><div class="line">-- Installing: /usr/bin/hhvm</div><div class="line">-- Installing: /usr/bin/hphpize</div><div class="line">➜  hhvm git:(HHVM-3.0) ✗</div></pre></td></tr></table></figure>
+<p>来，下面就是HHVM的测试了。</p>
+<p>首先看下–version和–help<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">➜  ~  hhvm --version</div><div class="line">HipHop VM 3.0.1 (rel)</div><div class="line">Compiler: tags/HHVM-3.0.1-0-g1da451b79f40686de6472d23cf90fdd09fa4dc23</div><div class="line">Repo schema: 11f0d546efba889ced1f9b92d9c9249f494d0b84</div><div class="line">➜  ~  hhvm --help</div><div class="line">Usage:</div><div class="line">   hhvm [-m &lt;mode&gt;] [&lt;options&gt;] [&lt;arg1&gt;] [&lt;arg2&gt;] ...</div><div class="line">Options:</div><div class="line">  --help                                display this message</div><div class="line">  --version                             display version number</div><div class="line">  --php                                 emulate the standard php command line</div><div class="line">  --compiler-id                         display the git hash for the compiler</div><div class="line">  --repo-schema                         display the repository schema id</div><div class="line">  -m [ --mode ] arg (=run)              run | debug (d) | server (s) | daemon |</div><div class="line">                                        replay | translate (t)</div><div class="line">  -a [ --interactive ]                  Shortcut for --mode debug</div><div class="line">  -c [ --config ] arg                   load specified config file</div><div class="line">  -v [ --config-value ] arg             individual configuration string in a </div><div class="line">                                        format of name=value, where name can be</div><div class="line">                                        any valid configuration for a config </div><div class="line">                                        file</div><div class="line">  -p [ --port ] arg (=-1)               start an HTTP server at specified port</div><div class="line">  --port-fd arg (=-1)                   use specified fd instead of creating a </div><div class="line">                                        socket</div><div class="line">  --ssl-port-fd arg (=-1)               use specified fd for SSL instead of </div><div class="line">                                        creating a socket</div><div class="line">  --admin-port arg (=-1)                start admin listener at specified port</div><div class="line">  --debug-config arg                    load specified debugger config file</div><div class="line">  -h [ --debug-host ] [=arg(=localhost)]</div><div class="line">                                        connect to debugger server at specified</div><div class="line">                                        address</div><div class="line">  --debug-port arg (=-1)                connect to debugger server at specified</div><div class="line">                                        port</div><div class="line">  --debug-extension arg                 PHP file that extends y command</div><div class="line">  --debug-cmd arg                       executes this debugger command and </div><div class="line">                                        returns its output in stdout</div><div class="line">  --debug-sandbox arg (=default)        initial sandbox to attach to when </div><div class="line">                                        debugger is started</div><div class="line">  -u [ --user ] arg                     run server under this user account</div><div class="line">  -f [ --file ] arg                     executing specified file</div><div class="line">  -l [ --lint ] arg                     lint specified file</div><div class="line">  -w [ --show ] arg                     output specified file and do nothing </div><div class="line">                                        else</div><div class="line">  --temp-file                           file specified is temporary and removed</div><div class="line">                                        after execution</div><div class="line">  --count arg (=1)                      how many times to repeat execution</div><div class="line">  --no-safe-access-check arg (=0)       whether to ignore safe file access </div><div class="line">                                        check</div><div class="line">  --arg arg                             arguments</div><div class="line">  --extra-header arg                    extra-header to add to log lines</div><div class="line">  --build-id arg                        unique identifier of compiled server </div><div class="line">                                        code</div><div class="line">  --instance-id arg                     unique identifier of server instance</div><div class="line">  --xhprof-flags arg (=0)               Set XHProf flags</div><div class="line">➜  ~</div></pre></td></tr></table></figure></p>
+<p>1、CPU密集型测试<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">➜  hhvm_test  cat t1.php      </div><div class="line">&lt;?php</div><div class="line">function fib($n)</div><div class="line">&#123;</div><div class="line">    if ($n &lt;= 2)</div><div class="line">        return 1;</div><div class="line">    else</div><div class="line">        return fib($n-1) + fib($n-2);</div><div class="line">&#125;</div><div class="line">$n = 36;</div><div class="line">printf(&quot;fib(%d) = %d\n&quot;, $n, fib($n, 2));</div><div class="line">?&gt;</div><div class="line">➜  hhvm_test  time php t1.php </div><div class="line">fib(36) = 14930352</div><div class="line">php t1.php  10.04s user 0.02s system 99% cpu 10.072 total</div><div class="line">➜  hhvm_test  time hhvm t1.php </div><div class="line">fib(36) = 14930352</div><div class="line">hhvm t1.php  0.52s user 0.12s system 52% cpu 1.226 total</div><div class="line">➜  hhvm_test</div></pre></td></tr></table></figure></p>
+<p>2、内存密集型测试<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">➜  hhvm_test  cat t2.php </div><div class="line">&lt;?php</div><div class="line">ini_set(&apos;memory_limit&apos;,&apos;1024M&apos;);</div><div class="line">$arr = array();</div><div class="line">for($i = 0; $i &lt; 2000000 ; $i++) &#123;</div><div class="line">    $arr[$i] = $i;  </div><div class="line">&#125;</div><div class="line">$arr2 = array();</div><div class="line">foreach($arr as $val)&#123;</div><div class="line">    $arr2[] = $val . $val;</div><div class="line">&#125;</div><div class="line">?&gt;</div><div class="line">➜  hhvm_test  time php t2.php </div><div class="line">php t2.php  2.29s user 1.13s system 99% cpu 3.427 total</div><div class="line">➜  hhvm_test  time hhvm t2.php </div><div class="line">hhvm t2.php  1.60s user 0.73s system 79% cpu 2.934 total</div><div class="line">➜  hhvm_test</div></pre></td></tr></table></figure></p>
+<p>从上面2个测试可以看出，CPU的消耗明显减少。</p>
+<hr>
+<p>最后，这边安装HHVM的目的就是想要用HHVM来跑WordPress（nginx -&gt; fastcgi -&gt; hhvm），按照官方的教程（<a href="https://github.com/facebook/hhvm/wiki/fastcgi）来配置了FastCGI" target="_blank" rel="external">https://github.com/facebook/hhvm/wiki/fastcgi）来配置了FastCGI</a> ，但是因为本blog是跑在ssl/(https)上的，测试下来有证书问题。</p>
+<p>正在研究HHVM SSL证书问题。</p>
+<p>（未完待续）</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HHVM/" rel="tag">#HHVM</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/03/25/drawing/" rel="next" title="本blog上的Drawing特效">
+                <i class="fa fa-chevron-left"></i> 本blog上的Drawing特效
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/04/09/using-mysql-socket-in-wordpress/" rel="prev" title="WordPress通过unix socket连接MySQL">
+                WordPress通过unix socket连接MySQL <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2014/03/25/install-hhvm/"
+           data-title="在CentOS6.5上安装HHVM3.0(解决依赖问题)" data-url="http://o.or2.io/2014/03/25/install-hhvm/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <div class="site-author-image"></div>
+          <p class="site-author-name" itemprop="name">Zinway</p>
+          <p class="site-description motion-element" itemprop="description">Talk about the Soy Sauce</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zinway" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zinw" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2013 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zinway</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zin"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

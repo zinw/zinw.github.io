@@ -1,0 +1,827 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="DNS,iptables," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Zinway's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="GFW的DNS劫持原理说起来挺简单，GFW对境外DNS的劫持，是在发现你请求敏感域名的DNS记录时，伪装成你请求的DNS返回一个污染的数据包给你的解析器，但并不会丢弃你向境外DNS的请求，也不会丢弃境外DNS返回的正确解析结果，他只是让错误的数据抢先回来欺骗了你的解析器而已，毕竟他直接从国内给你发污染数据怎么都比国外DNS返回正确数据要快，而解析器在先收到了欺骗数据包之后，就不会再管后面返回的正确">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过iptables去除DNS污染">
+<meta property="og:url" content="http://o.or2.io/2014/12/19/anti-dns-poison-with-iptables/index.html">
+<meta property="og:site_name" content="Zinway's Blog">
+<meta property="og:description" content="GFW的DNS劫持原理说起来挺简单，GFW对境外DNS的劫持，是在发现你请求敏感域名的DNS记录时，伪装成你请求的DNS返回一个污染的数据包给你的解析器，但并不会丢弃你向境外DNS的请求，也不会丢弃境外DNS返回的正确解析结果，他只是让错误的数据抢先回来欺骗了你的解析器而已，毕竟他直接从国内给你发污染数据怎么都比国外DNS返回正确数据要快，而解析器在先收到了欺骗数据包之后，就不会再管后面返回的正确">
+<meta property="og:updated_time" content="2016-08-29T05:38:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过iptables去除DNS污染">
+<meta name="twitter:description" content="GFW的DNS劫持原理说起来挺简单，GFW对境外DNS的劫持，是在发现你请求敏感域名的DNS记录时，伪装成你请求的DNS返回一个污染的数据包给你的解析器，但并不会丢弃你向境外DNS的请求，也不会丢弃境外DNS返回的正确解析结果，他只是让错误的数据抢先回来欺骗了你的解析器而已，毕竟他直接从国内给你发污染数据怎么都比国外DNS返回正确数据要快，而解析器在先收到了欺骗数据包之后，就不会再管后面返回的正确">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://o.or2.io/2014/12/19/anti-dns-poison-with-iptables/"/>
+
+  <title> 通过iptables去除DNS污染 | Zinway's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Zinway's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Talk about the Soy Sauce</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-fullstack">
+          <a href="/full-stack" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-bomb"></i> <br />
+            
+            Full Stack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-book"></i> <br />
+            
+            书架
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                通过iptables去除DNS污染
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2014-12-19T16:26:07+08:00" content="2014-12-19">
+              2014-12-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Network/" itemprop="url" rel="index">
+                    <span itemprop="name">Network</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2014/12/19/anti-dns-poison-with-iptables/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2014/12/19/anti-dns-poison-with-iptables/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>GFW的DNS劫持原理</strong>说起来挺简单，GFW对境外DNS的劫持，是在发现你请求敏感域名的DNS记录时，伪装成你请求的DNS返回一个污染的数据包给你的解析器，但并不会丢弃你向境外DNS的请求，也不会丢弃境外DNS返回的正确解析结果，他只是让错误的数据抢先回来欺骗了你的解析器而已，毕竟他直接从国内给你发污染数据怎么都比国外DNS返回正确数据要快，而解析器在先收到了欺骗数据包之后，就不会再管后面返回的正确数据了，这样你就被DNS劫持了。</p>
+<p><strong>一般的解决办法</strong>就是通过VPN通道访问DNS服务器，以获得干净的解析结果。本文的解决方案：我们可以在iptables的防火墙规则中，检测UDP的源端口为53的数据（DNS查询是通过UDP查询服务器的53端口实现的），一旦发现解析数据中包含有被GFW常用的用于DNS污染和劫持的IP，就丢弃这个数据包，对dnsmasq这些解析器来说污染的数据包根本就不会到达（本文涉及的iptables规则会抢先于任何应用先处理网络数据），等正确的境外DNS返回的数据到达后并不会被过滤，这样dnsmasq就获得了正确的DNS解析数据。</p>
+<p>首先我们要找到被GFW用于DNS污染和劫持的IP，目前搜集并统计到的无效IP（参考<a href="https://github.com/clowwindy/ChinaDNS/blob/master/iplist.txt" target="_blank" rel="external">clowwindy的iplist.txt</a>）如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">118.5.49.6</div><div class="line">128.121.126.139</div><div class="line">159.106.121.75</div><div class="line">169.132.13.103</div><div class="line">188.5.4.96</div><div class="line">189.163.17.5</div><div class="line">192.67.198.6</div><div class="line">197.4.4.12</div><div class="line">202.106.1.2</div><div class="line">202.181.7.85</div><div class="line">203.161.230.171</div><div class="line">203.98.7.65</div><div class="line">207.12.88.98</div><div class="line">208.56.31.43</div><div class="line">209.145.54.50</div><div class="line">209.220.30.174</div><div class="line">209.36.73.33</div><div class="line">209.85.229.138</div><div class="line">211.94.66.147</div><div class="line">213.169.251.35</div><div class="line">216.221.188.182</div><div class="line">216.234.179.13</div><div class="line">23.89.5.60</div><div class="line">243.185.187.39</div><div class="line">249.129.46.48</div><div class="line">253.157.14.165</div><div class="line">37.61.54.158</div><div class="line">4.36.66.178</div><div class="line">46.82.174.68</div><div class="line">49.2.123.56</div><div class="line">54.76.135.1</div><div class="line">59.24.3.173</div><div class="line">64.33.88.161</div><div class="line">64.33.99.47</div><div class="line">64.66.163.251</div><div class="line">65.104.202.252</div><div class="line">65.160.219.113</div><div class="line">66.45.252.237</div><div class="line">72.14.205.104</div><div class="line">72.14.205.99</div><div class="line">74.125.127.102</div><div class="line">74.125.155.102</div><div class="line">74.125.39.102</div><div class="line">74.125.39.113</div><div class="line">77.4.7.92</div><div class="line">78.16.49.15</div><div class="line">8.7.198.45</div><div class="line">93.46.8.89</div></pre></td></tr></table></figure></p>
+<p>后面需要用到这些IP的16进制，本文推荐个转换工具netmask（附<a href="https://github.com/zinw/VPN/raw/master/netmask_2.3.12.tar.gz" target="_blank" rel="external">netmask源码包</a>）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"> # netmask --help</div><div class="line">This is netmask, an address netmask generation utility</div><div class="line">Usage: netmask spec [spec ...]</div><div class="line">  -h, --helpPrint a summary of the options</div><div class="line">  -v, --versionPrint the version number</div><div class="line">  -d, --debugPrint status/progress information</div><div class="line">  -s, --standardOutput address/netmask pairs</div><div class="line">  -c, --cidrOutput CIDR format address lists</div><div class="line">  -i, --ciscoOutput Cisco style address lists</div><div class="line">  -r, --rangeOutput ip address ranges</div><div class="line">  -x, --hexOutput address/netmask pairs in hex</div><div class="line">  -o, --octalOutput address/netmask pairs in octal</div><div class="line">  -b, --binaryOutput address/netmask pairs in binary</div><div class="line">  -n, --nodnsDisable DNS lookups for addresses</div><div class="line">Definitions:</div><div class="line">  a spec can be any of:</div><div class="line">    address</div><div class="line">    address:address</div><div class="line">    address:+address</div><div class="line">    address/mask</div><div class="line">  an address can be any of:</div><div class="line">    NULLCMD=decimal number</div><div class="line">    0Noctal number</div><div class="line">    0xNhex number</div><div class="line">    N.N.N.Ndotted quad</div><div class="line">    hostname dns domain name</div><div class="line">  a mask is the number of bits set to one from the left</div></pre></td></tr></table></figure></p>
+<p>用下面的命令进行点分十进制转十六进制处理：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netmask -x `cat iplist.txt` |cut -d/ -f1 |cut -dx -f2</div></pre></td></tr></table></figure></p>
+<p>结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">042442b2</div><div class="line">0807c62d</div><div class="line">1759053c</div><div class="line">253d369e</div><div class="line">2e52ae44</div><div class="line">31027b38</div><div class="line">364c8701</div><div class="line">3b1803ad</div><div class="line">402158a1</div><div class="line">4021632f</div><div class="line">4042a3fb</div><div class="line">4168cafc</div><div class="line">41a0db71</div><div class="line">422dfced</div><div class="line">480ecd63</div><div class="line">480ecd68</div><div class="line">4a7d2766</div><div class="line">4a7d2771</div><div class="line">4a7d7f66</div><div class="line">4a7d9b66</div><div class="line">4d04075c</div><div class="line">4e10310f</div><div class="line">5d2e0859</div><div class="line">76053106</div><div class="line">80797e8b</div><div class="line">9f6a794b</div><div class="line">a9840d67</div><div class="line">bc050460</div><div class="line">bda31105</div><div class="line">c043c606</div><div class="line">c504040c</div><div class="line">ca6a0102</div><div class="line">cab50755</div><div class="line">cb620741</div><div class="line">cba1e6ab</div><div class="line">cf0c5862</div><div class="line">d0381f2b</div><div class="line">d1244921</div><div class="line">d155e58a</div><div class="line">d1913632</div><div class="line">d1dc1eae</div><div class="line">d35e4293</div><div class="line">d5a9fb23</div><div class="line">d8ddbcb6</div><div class="line">d8eab30d</div><div class="line">f3b9bb27</div><div class="line">f9812e30</div><div class="line">fd9d0ea5</div></pre></td></tr></table></figure></p>
+<p>然后就直接用iptables匹配包含这些ip的dns包并进行丢弃：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|042442b2|&quot; --from 60 --to 180 -j DROP</div></pre></td></tr></table></figure></p>
+<p>简单解释下，-m string表示启用string模块进行匹配，–algo bm表示启用贝叶(Boyer-Moore)字符串搜索算法，另一种算法是kmp(Knuth-Pratt-Morris)，具体应该只是效率和不同应用的区别，算法原理我就不细究了。<br>–hex-string就是要匹配的IP地址的HEX格式了，注意这里前面不要有0x表示16进制了，直接写16进制数据就行，后面跟着的就是IP地址的16进制格式。<br>–from 60 –to 180都是表示搜索的偏置范围(offset)，从第60 byte开始到180 byte结束，一般来说DNS返回包的长度很少有超过180字节，而IP值的位置因为协议格式的关系，基本上不可能出现在60字节之前，所以指定这个范围是足够的，同时也可以大大减轻搜索算法的运算压力。如果你担心有什么奇葩DNS返回的结果在这范围之外，删除这两个偏置选项就行了，这样会默认搜索整个字符串，但相应的搜索消耗的CPU资源就更多了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|042442b2|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|0807c62d|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|1759053c|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|253d369e|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|2e52ae44|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|31027b38|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|364c8701|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|3b1803ad|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|402158a1|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4021632f|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4042a3fb|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4168cafc|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|41a0db71|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|422dfced|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|480ecd63|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|480ecd68|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4a7d2766|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4a7d2771|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4a7d7f66|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4a7d9b66|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4d04075c|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|4e10310f|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|5d2e0859|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|76053106|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|80797e8b|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|9f6a794b|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|a9840d67|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|bc050460|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|bda31105|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|c043c606|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|c504040c|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|ca6a0102|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|cab50755|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|cb620741|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|cba1e6ab|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|cf0c5862|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d0381f2b|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d1244921|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d155e58a|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d1913632|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d1dc1eae|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d35e4293|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d5a9fb23|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d8ddbcb6|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|d8eab30d|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|f3b9bb27|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|f9812e30|&quot; --from 60 --to 180 -j DROP</div><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m string --algo bm --hex-string &quot;|fd9d0ea5|&quot; --from 60 --to 180 -j DROP</div></pre></td></tr></table></figure></p>
+<p>每个IP分别写一条这样的规则，然后就用你自己熟悉的方式来处理这些iptables规则。</p>
+<hr>
+<p><strong>More~</strong><br>iptables过滤空包：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">iptables -t mangle -I PREROUTING -p udp --sport 53 -m u32 --u32 &quot;0&amp;0x0F000000=0x05000000 &amp;&amp; 0&gt;&gt;22&amp;0x3C@8&amp;0x810F=0x8000 &amp;&amp; 0&gt;&gt;22&amp;0x3C@12&amp;0xFFFF=0x0000&quot; -j DROP</div></pre></td></tr></table></figure></p>
+<p>对关键部分解释下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">0&gt;&gt;22&amp;0x3C@8&amp;0x810F=0x8000</div></pre></td></tr></table></figure></p>
+<p>“0&gt;&gt;22&amp;0x3C”这部分是很常用的一个规则，你在别的地方也应该经常看到，表示取出IP报文头的长度，后面的@表示跳过这么多长度，也就是跳过IP头到UDP头部分。<br>8表示从第8个字节开始抓4个字节，其中第10个字节的第一位如果是1就表示这是一个响应包，0对应的是查询报，这个我们不用管；<br>第十个字节的最低位是RD位，劫持包的RD位是0；<br>第11个字节的低4位就是Reply Code的位置。<br>将这4个字节和0x810F做与操作就提出了响应标志位，RD位和Reply Code的值，判断出是一个RD=0，Reply Code为无错误的响应包，再继续和下面的规则匹配。<br>这三个条件缺一不可，尤其是对RD位的检查，这几乎是GFW劫持包最重要的特征。</p>
+<hr>
+<p>参考：</p>
+<ul>
+<li><a href="http://www.lifetyper.com/2014/06/anti-dns-poison-without-vpn.html" target="_blank" rel="external">无需VPN的OpenWRT DNS防污染方法</a></li>
+<li><a href="https://github.com/clowwindy/ChinaDNS-C/blob/master/iplist.txt" target="_blank" rel="external">clowwindy/ChinaDNS-C/iplist.txt</a></li>
+<li><a href="https://github.com/hackgfw/openwrt-gfw" target="_blank" rel="external">hackgfw/openwrt-gfw</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DNS/" rel="tag">#DNS</a>
+          
+            <a href="/tags/iptables/" rel="tag">#iptables</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/08/21/how-to-install-openvpn-server-on-centos-7/" rel="next" title="在CentOS 7上安装OpenVPN Server">
+                <i class="fa fa-chevron-left"></i> 在CentOS 7上安装OpenVPN Server
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/22/auto-break-gfw/" rel="prev" title="办公室自动翻墙">
+                办公室自动翻墙 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2014/12/19/anti-dns-poison-with-iptables/"
+           data-title="通过iptables去除DNS污染" data-url="http://o.or2.io/2014/12/19/anti-dns-poison-with-iptables/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <div class="site-author-image"></div>
+          <p class="site-author-name" itemprop="name">Zinway</p>
+          <p class="site-description motion-element" itemprop="description">Talk about the Soy Sauce</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zinway" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zinw" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2013 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zinway</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zin"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
