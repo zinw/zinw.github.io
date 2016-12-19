@@ -98,7 +98,7 @@
 VPN（翻墙的跳板，我们这边选择了Op">
 <meta property="og:type" content="article">
 <meta property="og:title" content="办公室自动翻墙">
-<meta property="og:url" content="http://o.or2.io/2014/12/22/auto-break-gfw/index.html">
+<meta property="og:url" content="http://zin.so/2014/12/22/auto-break-gfw/index.html">
 <meta property="og:site_name" content="Zinway's Blog">
 <meta property="og:description" content="引子：凑巧的是我5月中旬给公司搭了个翻墙环境来加速Google和Gmail的访问速度，然后5月27号Google就开始被封了 Orz ，然后就正好用上了这一套系统，后面就是不断地完善和优化，然后最近有空就Blog出来。
 需求:
@@ -143,7 +143,7 @@ VPN（翻墙的跳板，我们这边选择了Op">
 
 
 
-  <link rel="canonical" href="http://o.or2.io/2014/12/22/auto-break-gfw/"/>
+  <link rel="canonical" href="http://zin.so/2014/12/22/auto-break-gfw/"/>
 
   <title> 办公室自动翻墙 | Zinway's Blog </title>
 </head>
@@ -377,9 +377,9 @@ VPN（翻墙的跳板，我们这边选择了Op">
 <li>路由（定制墙外路由以及NAT，实现“自动”）；</li>
 <li>DNS（防止DNS污染以及CDN的正确解析）。</li>
 </ol>
-<h2 id="VPN-Server搭建"><a href="#VPN-Server搭建" class="headerlink" title="VPN Server搭建"></a>VPN Server搭建</h2><p>OpenVPN的搭建可以参考这一篇文章：<a href="http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/" target="_blank" rel="external">在CentOS 7上安装OpenVPN Server</a></p>
+<h2 id="VPN-Server搭建"><a href="#VPN-Server搭建" class="headerlink" title="VPN Server搭建"></a>VPN Server搭建</h2><p>OpenVPN的搭建可以参考这一篇文章：<a href="http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/">在CentOS 7上安装OpenVPN Server</a></p>
 <h2 id="路由定制及NAT"><a href="#路由定制及NAT" class="headerlink" title="路由定制及NAT"></a>路由定制及NAT</h2><p>使用OpenVPN Server将墙外的IP列表push给Client，在办公室网关上启一个OpenVPN Client并且开转发和NAT。<br>为了便于实现路由表的更新，我们使用了 client-config-dir，也就是 ccd 以及 push-continuation，将需要 push 的路由表放入 ccd 之中，配合 management console, 在更新了ccd 之中的路由表之后在 console 里面kill掉相关的client，这样 client 就会自动重连并且得到新的路由表，client 和 server 均无需重启。<br>翻墙路由表可参考<a href="https://github.com/zinw/VPN" target="_blank" rel="external">GFW 境外列表（部分）</a>。</p>
-<h2 id="DNS转发及优化"><a href="#DNS转发及优化" class="headerlink" title="DNS转发及优化"></a>DNS转发及优化</h2><p>为了方便管理和速度上的保证，我们没有直接使用bind，而是用dnsmasq来转发。<br>使用iptables来过滤DNS污染可以参考这一篇文章：<a href="http://zin.so/2014/12/19/anti-dns-poison-with-iptables/" target="_blank" rel="external">通过iptables去除DNS污染</a><br>dnsmasq默认把DNS丢给OpenDNS，一些CDN域名用dnsmasq.server的配置文件来丢给国内的DNS，一些需要定制IP地址的就用dnsmasq.address配置文件来个性化。</p>
+<h2 id="DNS转发及优化"><a href="#DNS转发及优化" class="headerlink" title="DNS转发及优化"></a>DNS转发及优化</h2><p>为了方便管理和速度上的保证，我们没有直接使用bind，而是用dnsmasq来转发。<br>使用iptables来过滤DNS污染可以参考这一篇文章：<a href="http://zin.so/2014/12/19/anti-dns-poison-with-iptables/">通过iptables去除DNS污染</a><br>dnsmasq默认把DNS丢给OpenDNS，一些CDN域名用dnsmasq.server的配置文件来丢给国内的DNS，一些需要定制IP地址的就用dnsmasq.address配置文件来个性化。</p>
 <h2 id="持续维护"><a href="#持续维护" class="headerlink" title="持续维护"></a>持续维护</h2><p>这一套系统我们需要维护2个表：<br>1个墙外路由表（一些个性化的墙外网站的访问需求）；<br>1个dnsmasq.server表（主要是CDN域名，这个只能发现以后一点一点加）。</p>
 
       
@@ -453,7 +453,7 @@ VPN（翻墙的跳板，我们这边选择了Op">
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2014/12/22/auto-break-gfw/"
-           data-title="办公室自动翻墙" data-url="http://o.or2.io/2014/12/22/auto-break-gfw/">
+           data-title="办公室自动翻墙" data-url="http://zin.so/2014/12/22/auto-break-gfw/">
       </div>
     
   </div>
@@ -513,7 +513,7 @@ VPN（翻墙的跳板，我们这边选择了Op">
           
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

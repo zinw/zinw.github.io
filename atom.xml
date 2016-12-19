@@ -4,9 +4,9 @@
   <subtitle>Talk about the Soy Sauce</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://o.or2.io/"/>
+  <link href="http://zin.so/"/>
   <updated>2016-08-29T05:38:34.000Z</updated>
-  <id>http://o.or2.io/</id>
+  <id>http://zin.so/</id>
   
   <author>
     <name>Zinway</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>交换CapsLock键和Control键</title>
-    <link href="http://o.or2.io/2015/05/04/swapping-caps-lock-and-control/"/>
-    <id>http://o.or2.io/2015/05/04/swapping-caps-lock-and-control/</id>
+    <link href="http://zin.so/2015/05/04/swapping-caps-lock-and-control/"/>
+    <id>http://zin.so/2015/05/04/swapping-caps-lock-and-control/</id>
     <published>2015-05-04T07:33:33.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -32,19 +32,19 @@
     
     </summary>
     
-      <category term="Shell" scheme="http://o.or2.io/categories/Shell/"/>
+      <category term="Shell" scheme="http://zin.so/categories/Shell/"/>
     
     
-      <category term="Mac OSX" scheme="http://o.or2.io/tags/Mac-OSX/"/>
+      <category term="Mac OSX" scheme="http://zin.so/tags/Mac-OSX/"/>
     
-      <category term="Vim" scheme="http://o.or2.io/tags/Vim/"/>
+      <category term="Vim" scheme="http://zin.so/tags/Vim/"/>
     
   </entry>
   
   <entry>
     <title>办公室自动翻墙</title>
-    <link href="http://o.or2.io/2014/12/22/auto-break-gfw/"/>
-    <id>http://o.or2.io/2014/12/22/auto-break-gfw/</id>
+    <link href="http://zin.so/2014/12/22/auto-break-gfw/"/>
+    <id>http://zin.so/2014/12/22/auto-break-gfw/</id>
     <published>2014-12-22T10:28:44.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -61,9 +61,9 @@
 <li>路由（定制墙外路由以及NAT，实现“自动”）；</li>
 <li>DNS（防止DNS污染以及CDN的正确解析）。</li>
 </ol>
-<h2 id="VPN-Server搭建"><a href="#VPN-Server搭建" class="headerlink" title="VPN Server搭建"></a>VPN Server搭建</h2><p>OpenVPN的搭建可以参考这一篇文章：<a href="http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/" target="_blank" rel="external">在CentOS 7上安装OpenVPN Server</a></p>
+<h2 id="VPN-Server搭建"><a href="#VPN-Server搭建" class="headerlink" title="VPN Server搭建"></a>VPN Server搭建</h2><p>OpenVPN的搭建可以参考这一篇文章：<a href="http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/">在CentOS 7上安装OpenVPN Server</a></p>
 <h2 id="路由定制及NAT"><a href="#路由定制及NAT" class="headerlink" title="路由定制及NAT"></a>路由定制及NAT</h2><p>使用OpenVPN Server将墙外的IP列表push给Client，在办公室网关上启一个OpenVPN Client并且开转发和NAT。<br>为了便于实现路由表的更新，我们使用了 client-config-dir，也就是 ccd 以及 push-continuation，将需要 push 的路由表放入 ccd 之中，配合 management console, 在更新了ccd 之中的路由表之后在 console 里面kill掉相关的client，这样 client 就会自动重连并且得到新的路由表，client 和 server 均无需重启。<br>翻墙路由表可参考<a href="https://github.com/zinw/VPN" target="_blank" rel="external">GFW 境外列表（部分）</a>。</p>
-<h2 id="DNS转发及优化"><a href="#DNS转发及优化" class="headerlink" title="DNS转发及优化"></a>DNS转发及优化</h2><p>为了方便管理和速度上的保证，我们没有直接使用bind，而是用dnsmasq来转发。<br>使用iptables来过滤DNS污染可以参考这一篇文章：<a href="http://zin.so/2014/12/19/anti-dns-poison-with-iptables/" target="_blank" rel="external">通过iptables去除DNS污染</a><br>dnsmasq默认把DNS丢给OpenDNS，一些CDN域名用dnsmasq.server的配置文件来丢给国内的DNS，一些需要定制IP地址的就用dnsmasq.address配置文件来个性化。</p>
+<h2 id="DNS转发及优化"><a href="#DNS转发及优化" class="headerlink" title="DNS转发及优化"></a>DNS转发及优化</h2><p>为了方便管理和速度上的保证，我们没有直接使用bind，而是用dnsmasq来转发。<br>使用iptables来过滤DNS污染可以参考这一篇文章：<a href="http://zin.so/2014/12/19/anti-dns-poison-with-iptables/">通过iptables去除DNS污染</a><br>dnsmasq默认把DNS丢给OpenDNS，一些CDN域名用dnsmasq.server的配置文件来丢给国内的DNS，一些需要定制IP地址的就用dnsmasq.address配置文件来个性化。</p>
 <h2 id="持续维护"><a href="#持续维护" class="headerlink" title="持续维护"></a>持续维护</h2><p>这一套系统我们需要维护2个表：<br>1个墙外路由表（一些个性化的墙外网站的访问需求）；<br>1个dnsmasq.server表（主要是CDN域名，这个只能发现以后一点一点加）。</p>
 ]]></content>
     
@@ -76,21 +76,21 @@
     
     </summary>
     
-      <category term="Network" scheme="http://o.or2.io/categories/Network/"/>
+      <category term="Network" scheme="http://zin.so/categories/Network/"/>
     
     
-      <category term="DNS" scheme="http://o.or2.io/tags/DNS/"/>
+      <category term="DNS" scheme="http://zin.so/tags/DNS/"/>
     
-      <category term="VPN" scheme="http://o.or2.io/tags/VPN/"/>
+      <category term="VPN" scheme="http://zin.so/tags/VPN/"/>
     
-      <category term="NAT" scheme="http://o.or2.io/tags/NAT/"/>
+      <category term="NAT" scheme="http://zin.so/tags/NAT/"/>
     
   </entry>
   
   <entry>
     <title>通过iptables去除DNS污染</title>
-    <link href="http://o.or2.io/2014/12/19/anti-dns-poison-with-iptables/"/>
-    <id>http://o.or2.io/2014/12/19/anti-dns-poison-with-iptables/</id>
+    <link href="http://zin.so/2014/12/19/anti-dns-poison-with-iptables/"/>
+    <id>http://zin.so/2014/12/19/anti-dns-poison-with-iptables/</id>
     <published>2014-12-19T08:26:07.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -122,19 +122,19 @@
     
     </summary>
     
-      <category term="Network" scheme="http://o.or2.io/categories/Network/"/>
+      <category term="Network" scheme="http://zin.so/categories/Network/"/>
     
     
-      <category term="DNS" scheme="http://o.or2.io/tags/DNS/"/>
+      <category term="DNS" scheme="http://zin.so/tags/DNS/"/>
     
-      <category term="iptables" scheme="http://o.or2.io/tags/iptables/"/>
+      <category term="iptables" scheme="http://zin.so/tags/iptables/"/>
     
   </entry>
   
   <entry>
     <title>在CentOS 7上安装OpenVPN Server</title>
-    <link href="http://o.or2.io/2014/08/21/how-to-install-openvpn-server-on-centos-7/"/>
-    <id>http://o.or2.io/2014/08/21/how-to-install-openvpn-server-on-centos-7/</id>
+    <link href="http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/"/>
+    <id>http://zin.so/2014/08/21/how-to-install-openvpn-server-on-centos-7/</id>
     <published>2014-08-21T09:34:35.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -156,23 +156,23 @@
     
     </summary>
     
-      <category term="Tools" scheme="http://o.or2.io/categories/Tools/"/>
+      <category term="Tools" scheme="http://zin.so/categories/Tools/"/>
     
     
-      <category term="VPN" scheme="http://o.or2.io/tags/VPN/"/>
+      <category term="VPN" scheme="http://zin.so/tags/VPN/"/>
     
-      <category term="NAT" scheme="http://o.or2.io/tags/NAT/"/>
+      <category term="NAT" scheme="http://zin.so/tags/NAT/"/>
     
-      <category term="OpenVPN" scheme="http://o.or2.io/tags/OpenVPN/"/>
+      <category term="OpenVPN" scheme="http://zin.so/tags/OpenVPN/"/>
     
-      <category term="CentOS 7" scheme="http://o.or2.io/tags/CentOS-7/"/>
+      <category term="CentOS 7" scheme="http://zin.so/tags/CentOS-7/"/>
     
   </entry>
   
   <entry>
     <title>在Mac OSX上通过dd命令制作系统启动盘</title>
-    <link href="http://o.or2.io/2014/08/18/dd-an-os-startup-disk-on-mac-osx/"/>
-    <id>http://o.or2.io/2014/08/18/dd-an-os-startup-disk-on-mac-osx/</id>
+    <link href="http://zin.so/2014/08/18/dd-an-os-startup-disk-on-mac-osx/"/>
+    <id>http://zin.so/2014/08/18/dd-an-os-startup-disk-on-mac-osx/</id>
     <published>2014-08-18T09:21:42.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -193,19 +193,19 @@
     
     </summary>
     
-      <category term="Shell" scheme="http://o.or2.io/categories/Shell/"/>
+      <category term="Shell" scheme="http://zin.so/categories/Shell/"/>
     
     
-      <category term="dd" scheme="http://o.or2.io/tags/dd/"/>
+      <category term="dd" scheme="http://zin.so/tags/dd/"/>
     
-      <category term="Mac OSX" scheme="http://o.or2.io/tags/Mac-OSX/"/>
+      <category term="Mac OSX" scheme="http://zin.so/tags/Mac-OSX/"/>
     
   </entry>
   
   <entry>
     <title>取模运算和求余运算的区别</title>
-    <link href="http://o.or2.io/2014/04/16/diff-mod-rem/"/>
-    <id>http://o.or2.io/2014/04/16/diff-mod-rem/</id>
+    <link href="http://zin.so/2014/04/16/diff-mod-rem/"/>
+    <id>http://zin.so/2014/04/16/diff-mod-rem/</id>
     <published>2014-04-16T04:46:59.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -300,21 +300,21 @@
     
     </summary>
     
-      <category term="Code" scheme="http://o.or2.io/categories/Code/"/>
+      <category term="Code" scheme="http://zin.so/categories/Code/"/>
     
     
-      <category term="c" scheme="http://o.or2.io/tags/c/"/>
+      <category term="c" scheme="http://zin.so/tags/c/"/>
     
-      <category term="Python" scheme="http://o.or2.io/tags/Python/"/>
+      <category term="Python" scheme="http://zin.so/tags/Python/"/>
     
-      <category term="运算" scheme="http://o.or2.io/tags/%E8%BF%90%E7%AE%97/"/>
+      <category term="运算" scheme="http://zin.so/tags/%E8%BF%90%E7%AE%97/"/>
     
   </entry>
   
   <entry>
     <title>WordPress通过unix socket连接MySQL</title>
-    <link href="http://o.or2.io/2014/04/09/using-mysql-socket-in-wordpress/"/>
-    <id>http://o.or2.io/2014/04/09/using-mysql-socket-in-wordpress/</id>
+    <link href="http://zin.so/2014/04/09/using-mysql-socket-in-wordpress/"/>
+    <id>http://zin.so/2014/04/09/using-mysql-socket-in-wordpress/</id>
     <published>2014-04-09T11:14:30.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -339,17 +339,17 @@
     
     </summary>
     
-      <category term="LNMP Stack" scheme="http://o.or2.io/categories/LNMP-Stack/"/>
+      <category term="LNMP Stack" scheme="http://zin.so/categories/LNMP-Stack/"/>
     
     
-      <category term="MySQL" scheme="http://o.or2.io/tags/MySQL/"/>
+      <category term="MySQL" scheme="http://zin.so/tags/MySQL/"/>
     
   </entry>
   
   <entry>
     <title>在CentOS6.5上安装HHVM3.0(解决依赖问题)</title>
-    <link href="http://o.or2.io/2014/03/25/install-hhvm/"/>
-    <id>http://o.or2.io/2014/03/25/install-hhvm/</id>
+    <link href="http://zin.so/2014/03/25/install-hhvm/"/>
+    <id>http://zin.so/2014/03/25/install-hhvm/</id>
     <published>2014-03-25T15:20:30.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -390,17 +390,17 @@
     
     </summary>
     
-      <category term="LNMP Stack" scheme="http://o.or2.io/categories/LNMP-Stack/"/>
+      <category term="LNMP Stack" scheme="http://zin.so/categories/LNMP-Stack/"/>
     
     
-      <category term="HHVM" scheme="http://o.or2.io/tags/HHVM/"/>
+      <category term="HHVM" scheme="http://zin.so/tags/HHVM/"/>
     
   </entry>
   
   <entry>
     <title>本blog上的Drawing特效</title>
-    <link href="http://o.or2.io/2014/03/25/drawing/"/>
-    <id>http://o.or2.io/2014/03/25/drawing/</id>
+    <link href="http://zin.so/2014/03/25/drawing/"/>
+    <id>http://zin.so/2014/03/25/drawing/</id>
     <published>2014-03-25T09:24:40.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -417,17 +417,17 @@
     
     </summary>
     
-      <category term="JavaScript" scheme="http://o.or2.io/categories/JavaScript/"/>
+      <category term="JavaScript" scheme="http://zin.so/categories/JavaScript/"/>
     
     
-      <category term="js" scheme="http://o.or2.io/tags/js/"/>
+      <category term="js" scheme="http://zin.so/tags/js/"/>
     
   </entry>
   
   <entry>
     <title>首页refresh重定向</title>
-    <link href="http://o.or2.io/2014/03/19/meta-refresh/"/>
-    <id>http://o.or2.io/2014/03/19/meta-refresh/</id>
+    <link href="http://zin.so/2014/03/19/meta-refresh/"/>
+    <id>http://zin.so/2014/03/19/meta-refresh/</id>
     <published>2014-03-19T06:20:32.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -447,19 +447,19 @@
     
     </summary>
     
-      <category term="LNMP Stack" scheme="http://o.or2.io/categories/LNMP-Stack/"/>
+      <category term="LNMP Stack" scheme="http://zin.so/categories/LNMP-Stack/"/>
     
     
-      <category term="refresh" scheme="http://o.or2.io/tags/refresh/"/>
+      <category term="refresh" scheme="http://zin.so/tags/refresh/"/>
     
-      <category term="rewrite" scheme="http://o.or2.io/tags/rewrite/"/>
+      <category term="rewrite" scheme="http://zin.so/tags/rewrite/"/>
     
   </entry>
   
   <entry>
     <title>Git常用命令别名</title>
-    <link href="http://o.or2.io/2014/03/18/git-alias/"/>
-    <id>http://o.or2.io/2014/03/18/git-alias/</id>
+    <link href="http://zin.so/2014/03/18/git-alias/"/>
+    <id>http://zin.so/2014/03/18/git-alias/</id>
     <published>2014-03-18T06:22:47.000Z</published>
     <updated>2016-08-29T05:38:34.000Z</updated>
     
@@ -472,12 +472,12 @@
     
     </summary>
     
-      <category term="Shell" scheme="http://o.or2.io/categories/Shell/"/>
+      <category term="Shell" scheme="http://zin.so/categories/Shell/"/>
     
     
-      <category term="alias" scheme="http://o.or2.io/tags/alias/"/>
+      <category term="alias" scheme="http://zin.so/tags/alias/"/>
     
-      <category term="git" scheme="http://o.or2.io/tags/git/"/>
+      <category term="git" scheme="http://zin.so/tags/git/"/>
     
   </entry>
   
